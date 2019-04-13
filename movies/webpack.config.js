@@ -12,9 +12,9 @@ module.exports = {
         // 'webpack/hot/only-dev-server',
         // './src/index'
       ],
-    // devtool: 'sourcemaps',
+    devtool: 'sourcemaps',
     // cache: true,
-    // mode: 'development',
+    mode: 'development',
     devServer: {
         contentBase: path.join(__dirname, '/src/main/resources/static/built/'),
         // contentBase: './src',
@@ -24,7 +24,10 @@ module.exports = {
         // publicPath: '/'
 
         // compress: true,
-        // port: 9000
+        port: 3000,
+        proxy: {
+            '/api': 'http://localhost:8080'
+          }
     },
     output: {
         path: path.join(__dirname, '/src/main/resources/static/built/'),
@@ -55,7 +58,7 @@ module.exports = {
         ]
     },
     plugins: [new HtmlWebpackPlugin({
-        template: './src/main/js/index.html'
+        template: './src/main/resources/templates/index.html'
     })]
 
 };

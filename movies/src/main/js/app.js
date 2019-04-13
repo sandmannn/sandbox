@@ -9,36 +9,37 @@ class App extends React.Component {
 
 	constructor(props) {
 		super(props);
-		this.state = {employees: []};
+		this.state = {movies: []};
 	}
 
 	componentDidMount() {
-		client({method: 'GET', path: '/api/moviess'}).done(response => {
-			this.setState({employees: response.entity._embedded.employees});
+		client({method: 'GET', path: '/api/movies'}).done(response => {
+			this.setState({movies: response.entity._embedded.movies});
 		});
 	}
 
 	render() {
 		return (
-			<EmployeeList employees={this.state.employees}/>
+			<MovieList movies={this.state.movies}/>
 		)
 	}
 }
 
-class EmployeeList extends React.Component{
+class MovieList extends React.Component{
 	render() {
-		const employees = this.props.employees.map(employee =>
-			<Employee key={employee._links.self.href} employee={employee}/>
+        console.log(this.props);
+		const movies = this.props.movies.map(movie =>
+			<Movie key={movie._links.self.href} movie={movie}/>
 		);
 		return (
 			<table>
 				<tbody>
 					<tr>
-						<th>First Name</th>
-						<th>Last Name</th>
+						<th>Name</th>
+						<th>imdbLink</th>
 						<th>Description</th>
 					</tr>
-					{employees}
+					{movies}
 				</tbody>
 			</table>
 		)
@@ -46,19 +47,17 @@ class EmployeeList extends React.Component{
 }
 
 
-class Employee extends React.Component{
+class Movie extends React.Component{
 	render() {
 		return (
 			<tr>
-				<td>{this.props.employee.firstName}</td>
-				<td>{this.props.employee.lastName}</td>
-				<td>{this.props.employee.description}</td>
+				<td>{this.props.movie.name}</td>
+				<td>{this.props.movie.imdbLink}</td>
+				<td>{this.props.movie.description}</td>
 			</tr>
 		)
 	}
 }
-
-// {/* <Employee key={employee._links.self.href} data={employee} /> */}
 
 
 ReactDOM.render(
