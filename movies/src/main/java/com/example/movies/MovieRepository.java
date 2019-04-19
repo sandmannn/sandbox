@@ -1,7 +1,7 @@
 package com.example.movies;
 
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.PagingAndSortingRepository;
 
-public interface MovieRepository extends CrudRepository<Movie, Long> {
+public interface MovieRepository extends PagingAndSortingRepository<Movie, Long> {
 
 }
