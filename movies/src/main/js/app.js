@@ -15,7 +15,8 @@ class App extends React.Component {
         this.updatePageSize = this.updatePageSize.bind(this);
 		this.onCreate = this.onCreate.bind(this);
 		this.onDelete = this.onDelete.bind(this);
-		this.onNavigate = this.onNavigate.bind(this);
+        this.onNavigate = this.onNavigate.bind(this);
+        
 	}
 
 	componentDidMount() {
