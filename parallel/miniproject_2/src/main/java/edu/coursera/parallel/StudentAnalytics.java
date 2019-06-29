@@ -106,14 +106,14 @@ public final class StudentAnalytics {
      */
     public String mostCommonFirstNameOfInactiveStudentsParallelStream(
             final Student[] studentArray) {
-        return "";sta
 
-
-//        return Arrays.stream(studentArray).filter(s -> !s.checkIsCurrent())
-//                .collect(Collectors.groupingBy(Student::getLastName)
-//                )
-//                .
-//                .map(s -> (s.getLastName())).getAsDouble();
+        return Arrays.stream(studentArray).filter(s -> !s.checkIsCurrent())
+                .collect(Collectors.groupingBy(Student::getFirstName, Collectors.counting()))
+                .entrySet()
+                .stream()
+                .max(Map.Entry.comparingByValue())
+                .get()
+                .getKey();
     }
 
     /**
@@ -149,6 +149,9 @@ public final class StudentAnalytics {
      */
     public int countNumberOfFailedStudentsOlderThan20ParallelStream(
             final Student[] studentArray) {
-        throw new UnsupportedOperationException();
+        return (int) Arrays.stream(studentArray)
+                .filter(s->!s.checkIsCurrent() && s.getAge() > 20 && s.getGrade()<65)
+                .count();
+
     }
 }
