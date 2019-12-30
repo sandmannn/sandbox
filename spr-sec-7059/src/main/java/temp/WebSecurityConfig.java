@@ -21,18 +21,19 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
   @Override
   public void configure(AuthenticationManagerBuilder builder) throws Exception{
     builder.inMemoryAuthentication()
-            .withUser("user").password("{noop}password").roles("USER");
+            .withUser("admin").password("{noop}admin").roles("admin").and()
+            .withUser("user").password("{noop}user").roles("user");
+//            .withUser("user").password("{noop}password").roles("USER");
   }
 
 // issue content
-//            .withUser("admin").password("{noop}admin").roles("admin").and()
-//            .withUser("user").password("{noop}user").roles("user");
-//  @Bean
-//  public RoleHierarchy roleHierarchy() {
-//    RoleHierarchyImpl roleHierarchy = new RoleHierarchyImpl();
-//    roleHierarchy.setHierarchy("ROLE_admin > ROLE_user");
-//    return roleHierarchy;
-//  }
+
+  @Bean
+  public RoleHierarchy roleHierarchy() {
+    RoleHierarchyImpl roleHierarchy = new RoleHierarchyImpl();
+    roleHierarchy.setHierarchy("ROLE_admin > ROLE_user");
+    return roleHierarchy;
+  }
 
 
 // tutorial content
