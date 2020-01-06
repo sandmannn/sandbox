@@ -19,6 +19,13 @@
 	<h1>visible for admin but not user</h1>
 
 
+ <sec:authorize access="hasRole('admin')">
+            <p>admin mew</p>
+        </sec:authorize>
+        <sec:authorize access="hasRole('user')">
+            <p>user mew</p>
+        </sec:authorize>
+
 
 </body>
 </html>
