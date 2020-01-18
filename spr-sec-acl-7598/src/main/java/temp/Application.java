@@ -67,6 +67,11 @@ public class Application extends SpringBootServletInitializer {
     return Server.createTcpServer("-tcp", "-tcpAllowOthers", "-tcpPort", "9091");
   }
 
+  @Bean(initMethod = "start", destroyMethod = "stop")
+  public Server inMemoryH2webDatabaseServer() throws SQLException {
+    return Server.createWebServer("-web","-webAllowOthers","-webPort","8082");
+  }
+
 
   @Override
   protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
