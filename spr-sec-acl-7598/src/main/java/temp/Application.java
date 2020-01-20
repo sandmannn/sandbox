@@ -16,6 +16,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import hello.FileDAO;
+import hello.File;
 
 import javax.annotation.PostConstruct;
 import java.sql.ResultSet;
@@ -51,35 +52,16 @@ public class Application extends SpringBootServletInitializer {
       System.out.println(sql);
       jdbcTemplate.execute(sql);
     });
-    hello.File f = new hello.File("filename");
+    File f = new File("filename", "important content");
     FileDAO fd = new FileDAO(jdbcTemplate);
     fd.create(f);
+    fd.create(new File("f1", "stuff1"));
+    fd.create(new File("f2", "stuff2"));
+    fd.create(new File("f3", "stuff3"));
 
-    System.out.println(String.format("****** Fetching from table: %s ******", "Employees"));
-    jdbcTemplate.query("select id,first_name,last_name from employees",
-            new RowMapper<Object>() {
-              @Override
-              public Object mapRow(ResultSet rs, int i) throws SQLException {
-                System.out.println(String.format("id:%s,first_name:%s,last_name:%s",
-                        rs.getString("id"),
-                        rs.getString("first_name"),
-                        rs.getString("last_name")));
-                return null;
-              }
-            });
+    System.out.println("file from dao: " + fd.byName("filename"));
+    System.out.println("file from dao: " + fd.byName("f2"));
 
-    System.out.println(String.format("****** Fetching from table: %s ******", "File"));
-    jdbcTemplate.query("select id,file_name,content from file",
-            new RowMapper<Object>() {
-              @Override
-              public Object mapRow(ResultSet rs, int i) throws SQLException {
-                System.out.println(String.format("id:%s,file_name:%s,content:%s",
-                        rs.getString("id"),
-                        rs.getString("file_name"),
-                        rs.getString("content")));
-                return null;
-              }
-            });
 
   }
 

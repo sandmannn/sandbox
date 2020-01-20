@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 
 public class FileDAO {
     private static final String INSERT_INTO_FILE = "insert into file(file_name, content) values (?,?)";
+    private static final String SELECT_FILE_BY_NAME = "select id, file_name, content from file where file_name = ?";
 
     private JdbcTemplate jdbcTemplate;
     FileDAO(JdbcTemplate jdbcTemplate) {
@@ -27,5 +28,17 @@ public class FileDAO {
          new Object[] { file.getName(), file.getContent()});
 //            FieldUtils.setProtectedFieldValue("id", file, obtainPrimaryKey());
 
+    }
+    public File byName(String name) {
+        return jdbcTemplate.queryForObject(SELECT_FILE_BY_NAME,
+            new Object[] { name }, (rs, rowNumber) -> {
+                    System.out.println("rs" + rs);
+                    System.out.println("rowNumber" + rowNumber);
+                String c = rs.getString("content");
+                if (c==null) return null;
+                File res = new File(name, c);
+                res.setId(rs.getLong("ID"));
+                return res;
+            });
     }
 }
