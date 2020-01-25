@@ -10,6 +10,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
+import org.springframework.cache.ehcache.EhCacheManagerFactoryBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.jdbc.core.RowMapper;
@@ -17,8 +18,18 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import hello.FileDAO;
 import hello.File;
+import org.springframework.security.acls.domain.*;
+import org.springframework.security.acls.jdbc.BasicLookupStrategy;
+import org.springframework.security.acls.jdbc.JdbcMutableAclService;
+import org.springframework.security.acls.jdbc.LookupStrategy;
+import org.springframework.security.acls.model.AclService;
+import org.springframework.security.acls.model.MutableAclService;
+import org.springframework.security.acls.model.PermissionGrantingStrategy;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.cache.ehcache.EhCacheFactoryBean;
 
 import javax.annotation.PostConstruct;
+import javax.sql.DataSource;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
@@ -33,6 +44,59 @@ public class Application extends SpringBootServletInitializer {
 
   @Autowired
   private JdbcTemplate jdbcTemplate;
+
+  private DataSource dataSource;
+
+
+  @Bean
+  public JdbcMutableAclService aclService() {
+    return new JdbcMutableAclService(dataSource, lookupStrategy(), aclCache());
+  }
+
+
+  @Autowired
+  public void setDataSource(DataSource dataSource) {
+    this.dataSource = dataSource;
+  }
+
+  @Bean
+  public AclAuthorizationStrategy aclAuthorizationStrategy() {
+    return new AclAuthorizationStrategyImpl(new SimpleGrantedAuthority("ROLE_ADMIN"));
+  }
+
+
+  @Bean
+  public PermissionGrantingStrategy permissionGrantingStrategy() {
+    return new DefaultPermissionGrantingStrategy(new ConsoleAuditLogger());
+  }
+
+  @Bean
+  public LookupStrategy lookupStrategy() {
+    return new BasicLookupStrategy(dataSource, aclCache(), aclAuthorizationStrategy(), new ConsoleAuditLogger());
+  }
+
+
+  @Bean
+  public EhCacheBasedAclCache aclCache() {
+    return new EhCacheBasedAclCache(aclEhCacheFactoryBean().getObject(), permissionGrantingStrategy(), aclAuthorizationStrategy());
+  }
+
+  @Bean
+  public EhCacheFactoryBean aclEhCacheFactoryBean() {
+    EhCacheFactoryBean ehCacheFactoryBean = new EhCacheFactoryBean();
+    ehCacheFactoryBean.setCacheManager(aclCacheManager().getObject());
+    ehCacheFactoryBean.setCacheName("aclCache");
+    return ehCacheFactoryBean;
+  }
+
+  @Bean
+  public EhCacheManagerFactoryBean aclCacheManager() {
+    return new EhCacheManagerFactoryBean();
+  }
+
+
+//  @Autowired
+  private AclService aclService;
 
   @PostConstruct
   private void initDb() {
@@ -92,7 +156,7 @@ public class Application extends SpringBootServletInitializer {
 
 
     File f = new File("filename", "important content");
-    FileDAO fd = new FileDAO(jdbcTemplate);
+    FileDAO fd = new FileDAO(jdbcTemplate, aclService());
     fd.create(f);
     fd.create(new File("f1", "stuff1"));
     fd.create(new File("f2", "stuff2"));
@@ -100,6 +164,9 @@ public class Application extends SpringBootServletInitializer {
 
     System.out.println("file from dao: " + fd.byName("filename"));
     System.out.println("file from dao: " + fd.byName("f2"));
+
+
+    fd.createUser("mew");
     System.out.println("users: " + Arrays.toString(fd.getUsers()));
 
 

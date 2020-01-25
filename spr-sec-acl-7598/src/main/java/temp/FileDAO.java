@@ -4,12 +4,13 @@ import hello.File;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.security.acls.domain.BasePermission;
 import org.springframework.security.acls.domain.ObjectIdentityImpl;
 import org.springframework.security.acls.domain.PrincipalSid;
-import org.springframework.security.acls.model.ObjectIdentity;
+import org.springframework.security.acls.model.*;
 import org.springframework.security.util.FieldUtils;
 import org.springframework.stereotype.Component;
-import org.springframework.security.acls.model.Sid;
+import org.springframework.util.Assert;
 
 public class FileDAO {
     private static final String INSERT_INTO_FILE = "insert into file(file_name, content) values (?,?)";
@@ -17,8 +18,16 @@ public class FileDAO {
     private static final String SELECT_FROM_USERS = "SELECT sid FROM acl_sid";
 
     private JdbcTemplate jdbcTemplate;
-    FileDAO(JdbcTemplate jdbcTemplate) {
+
+
+//    @Autowired
+    private MutableAclService aclService;
+
+    FileDAO(JdbcTemplate jdbcTemplate, MutableAclService aclService) {
+
         this.jdbcTemplate = jdbcTemplate;
+        Assert.notNull(aclService, "MutableAclService required");
+        this.aclService = aclService;
     }
 
 
@@ -37,7 +46,14 @@ public class FileDAO {
 
     public void createUser(String sidd) {
         Sid sid = new PrincipalSid("Samantha");
-        ObjectIdentity identity = new ObjectIdentityImpl(new Object(){public Long getId(){ return 43L;}});
+        File f = new File("mew", "23");
+        f.setId(31321L);
+        ObjectIdentity identity = new ObjectIdentityImpl(f);
+        Permission p = BasePermission.READ;
+//        MutableAcl acl = aclService.createAcl(identity);
+
+
+
 //        TODO: add acl service, create isntance of it
 
 
